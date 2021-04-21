@@ -1,41 +1,10 @@
 // routes/index.js
 const express = require('express');
 const router = express.Router();
-
 const libKakaoWork = require('../libs/kakaoWork');
 
-function mainMenuView(conversationId) {
-  console.log('convid', conversationId)
-  const menuItems = [['메뉴1', 'menu1'], ['메뉴2', 'menu2'], ['메뉴3', 'menu3'], ['메뉴4', 'menu4']]
-  .map(([menuName, action_name]) => ({
-    type: 'button',
-	action_type: 'submit_action',
-	action_name,
-	value: action_name,
-	text: menuName,
-	style: 'default'
-  }));
-  console.log(menuItems);
-
-  return {
-    conversationId,
-    text: '소마 멘토링 ',
-    blocks: [
-      {
-        type: 'header',
-        text: '소마 멘토링 봇',
-        style: 'blue',
-      },
-      {
-        type: 'text',
-        text: '메뉴를 선택해주세요!',
-        markdown: true,
-      },
-	  ...menuItems,
-      {type: 'button', action_type: 'call_modal', value: 'cafe_survey', text: '설문 참여하기', style: 'default'}
-    ],
-  }
-}
+const mainMenuView = require('../views/mainMenuView');
+const mainMenuController = require('../controllers/mainMenuController');
 
 function menu1View(conversationId) {
   return {
@@ -213,14 +182,6 @@ async function handleSubmission(req) {
     ],	
   });
 }
-/*
-async function handleMenuItem({message, menuItemId}) {
-
-  if (!(menuItemId in menuItemHandler))
-    menuItemId = 'home'
-  await libKakaoWork.sendMessage(menuItemHandler[menuItemId](message.conversation_id))
-}
-*/
 
 async function unsupportedSubmitActionController(req) {
   const { message, action_name } = req.body
@@ -237,10 +198,6 @@ async function unsupportedSubmitActionController(req) {
   });
 }
 
-async function mainMenuController(req) {
-  const { message } = req.body;
-  await libKakaoWork.sendMessage(mainMenuView(message.conversation_id))
-}
 
 async function menu1Controller(req) {
   console.log('menu1Controller');
