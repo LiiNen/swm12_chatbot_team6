@@ -4,19 +4,18 @@ const router = express.Router();
 
 const libKakaoWork = require('../libs/kakaoWork');
 
-function handleMainMenu(conversationId) {
+function mainMenuView(conversationId) {
   const menuItems = [['메뉴1', 'menu1'], ['메뉴2', 'menu2'], ['메뉴3', 'menu3'], ['메뉴4', 'menu4']]
-  .map(([menuName, menuValue]) => ({
+  .map(([menuName, action_name]) => ({
     type: 'button',
 	action_type: 'submit_action',
-	action_name: 'menu_item',
-	value: menuValue,
+	action_name,
 	text: menuName,
 	style: 'default'
   }));
 
   return {
-    conversationId: conversationId,
+    conversationId,
     text: '소마 멘토링 ',
     blocks: [
       {
@@ -30,12 +29,12 @@ function handleMainMenu(conversationId) {
         markdown: true,
       },
 	  ...menuItems,
-      {type: 'button', action_type: 'call_modal', action_name: 'cafe_survey', value: 'cafe_survey', text: '설문 참여하기', style: 'default'}
+      {type: 'button', action_type: 'call_modal', value: 'cafe_survey', text: '설문 참여하기', style: 'default'}
     ],
   }
 }
 
-function handleMenu1(conversationId) {
+function menu1View(conversationId) {
   return {
     conversationId,
     text: '메뉴1!',
@@ -53,8 +52,7 @@ function handleMenu1(conversationId) {
 	  {
         type: 'button',
      	action_type: 'submit_action',
-    	action_name: 'menu_item',
-    	value: 'home',
+    	action_name: 'home',
 	    text: '홈으로',
 	    style: 'default'
       },
@@ -62,7 +60,6 @@ function handleMenu1(conversationId) {
         type: 'button',
      	action_type: 'submit_action',
     	action_name: 'menu_item',
-    	value: 'home',
 	    text: '다음 메뉴',
 	    style: 'default'
       }
@@ -78,7 +75,7 @@ router.get('/', async (req, res, next) => {
   );
   
   const messages = await Promise.all([
-    conversations.map((conversation) => libKakaoWork.sendMessage(handleMainMenu(conversation.id))),
+    conversations.map((conversation) => libKakaoWork.sendMessage(mainMenuView(conversation.id))),
   ]);
 
   // 응답값은 자유롭게 작성하셔도 됩니다.
@@ -161,7 +158,8 @@ router.post('/request', async (req, res, next) => {
   res.json({});
 });
 
-async function handleSubmission({message, action_time, actions, value}) {
+async function handleSubmission(req) {
+  const {message, action_time, actions, value} = req.body;
   console.log('handleSubmissions');
   await libKakaoWork.sendMessage({
     conversationId: message.conversation_id,
@@ -210,23 +208,54 @@ async function handleSubmission({message, action_time, actions, value}) {
     ],	
   });
 }
-
+/*
 async function handleMenuItem({message, menuItemId}) {
-  const menuItemHandler = {
-    'home': handleMainMenu,
-	'menu1': handleMenu1,
-	'menu2': handleMenu1,
-	'menu3': handleMenu1,
-	'menu4': handleMenu1
-  }
+
   if (!(menuItemId in menuItemHandler))
     menuItemId = 'home'
   await libKakaoWork.sendMessage(menuItemHandler[menuItemId](message.conversation_id))
 }
+*/
 
-async function handleSubmitAction({message, action_time, action_name, value}) {
+async function unsupportedSubmitActionController(req) {
+  const { message, action_name } = req.body
+  console.log(`unsupported submit_action ${action_name}}`)
+  await libKakaoWork.sendMessage({
+    conversationId: message.conversation_id,
+    text: '콜백 에러',
+    blocks: [
+      {
+        type: 'text',
+        text: `지원되지 않는 콜백 타입 ${type} 입니다.`,
+      },
+    ]
+  });
+}
+
+async function mainMenuController(req) {
+  const { message } = req.body;
+  await libKakaoWork.sendMessage(mainMenuView(message.conversation_id))
+}
+
+async function menu1Controller(req) {
+  const { message } = req.body;
+  await libKakaoWork.sendMessage(menu1View(message.conversation_id))
+}
+
+async function handleSubmitAction(req) {
   console.log('handleSubmitAction');
-  await handleMenuItem({message, menuItemId: value});
+  const { action_name } = req.body;
+  const submitActionHandler = {
+    'home': mainMenuController,
+	'menu1': menu1Controller,
+	'menu2': menu1Controller,
+	'menu3': menu1Controller,
+	'menu4': menu1Controller,
+	'': unsupportedSubmitActionController
+  }
+  if (!(action_name in submitActionHandler))
+    action_name = '';
+  await submitActionHandler[action_name](req);
 }
 
 async function handleUnsupportedCallback({message, type}) {
@@ -253,9 +282,9 @@ router.post('/callback', async (req, res, next) => {
     'submit_action': handleSubmitAction,
   }
   if (type in callbackHandler)
-    callbackHandler[type](req.body);
+    callbackHandler[type](req);
   else
-    handleUnsupportedCallback(req.body);
+    handleUnsupportedCallback(req);
 
   res.json({ result: true });
 });
