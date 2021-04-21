@@ -1,9 +1,17 @@
-# swm12_chatbot_team6
+<h1 align="center">멘토링 신청 도와줘!</h1>
+<h4 align="center">SW마에스트로 연수 과정 도우미</h4>
+<p align="center"> readme 제목 및 부제는 이미지로 추후 교체할 예정</p>
 
-<br><br><br>
+<p align="center">
+  <a href="https://www.notion.so/1fff39fc14a14fdf932592ab28f8858d"> 업무 공유 notion 바로가기 </a>
+</p>
+
+<br><br>
 ## 프로젝트 개요
+<p>본 대화 내용은 실화를 바탕으로 재구성되었습니다.</p>
 <p align="center"><img src="/readme_img/project_intro.png"></p>
 
+<br><br>
 ## 팀 정보 (Team Information)
 (이름순, 추후 수정 예정)
 <table width="788">
