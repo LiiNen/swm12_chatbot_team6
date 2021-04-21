@@ -5,14 +5,17 @@ const router = express.Router();
 const libKakaoWork = require('../libs/kakaoWork');
 
 function mainMenuView(conversationId) {
+  console.log('convid', conversationId)
   const menuItems = [['메뉴1', 'menu1'], ['메뉴2', 'menu2'], ['메뉴3', 'menu3'], ['메뉴4', 'menu4']]
   .map(([menuName, action_name]) => ({
     type: 'button',
 	action_type: 'submit_action',
 	action_name,
+	value: action_name,
 	text: menuName,
 	style: 'default'
   }));
+  console.log(menuItems);
 
   return {
     conversationId,
@@ -46,20 +49,22 @@ function menu1View(conversationId) {
       },
       {
         type: 'text',
-        text: `메뉴1!`,
+        text: '메뉴1!',
         markdown: true,
       },
 	  {
         type: 'button',
      	action_type: 'submit_action',
     	action_name: 'home',
+		value: 'home',
 	    text: '홈으로',
 	    style: 'default'
       },
 	  	  {
         type: 'button',
      	action_type: 'submit_action',
-    	action_name: 'menu_item',
+    	action_name: 'next_menu',
+		value: 'next_menu',
 	    text: '다음 메뉴',
 	    style: 'default'
       }
@@ -238,6 +243,7 @@ async function mainMenuController(req) {
 }
 
 async function menu1Controller(req) {
+  console.log('menu1Controller');
   const { message } = req.body;
   await libKakaoWork.sendMessage(menu1View(message.conversation_id))
 }
@@ -245,6 +251,7 @@ async function menu1Controller(req) {
 async function handleSubmitAction(req) {
   console.log('handleSubmitAction');
   const { action_name } = req.body;
+  console.log('action_name', action_name);
   const submitActionHandler = {
     'home': mainMenuController,
 	'menu1': menu1Controller,
