@@ -4,44 +4,81 @@ const router = express.Router();
 
 const libKakaoWork = require('../libs/kakaoWork');
 
+function handleMainMenu(conversationId) {
+  const menuItems = [['메뉴1', 'menu1'], ['메뉴2', 'menu2'], ['메뉴3', 'menu3'], ['메뉴4', 'menu4']]
+  .map(([menuName, menuValue]) => ({
+    type: 'button',
+	action_type: 'submit_action',
+	action_name: 'menu_item',
+	value: menuValue,
+	text: menuName,
+	style: 'default'
+  }));
+
+  return {
+    conversationId: conversationId,
+    text: '소마 멘토링 ',
+    blocks: [
+      {
+        type: 'header',
+        text: '소마 멘토링 봇',
+        style: 'blue',
+      },
+      {
+        type: 'text',
+        text: '메뉴를 선택해주세요!',
+        markdown: true,
+      },
+	  ...menuItems,
+      {type: 'button', action_type: 'call_modal', action_name: 'cafe_survey', value: 'cafe_survey', text: '설문 참여하기', style: 'default'}
+    ],
+  }
+}
+
+function handleMenu1(conversationId) {
+  return {
+    conversationId,
+    text: '메뉴1!',
+    blocks: [
+	  {
+        type: 'header',
+        text: '소마 멘토링 봇',
+        style: 'blue',
+      },
+      {
+        type: 'text',
+        text: `메뉴1!`,
+        markdown: true,
+      },
+	  {
+        type: 'button',
+     	action_type: 'submit_action',
+    	action_name: 'menu_item',
+    	value: 'home',
+	    text: '홈으로',
+	    style: 'default'
+      },
+	  	  {
+        type: 'button',
+     	action_type: 'submit_action',
+    	action_name: 'menu_item',
+    	value: 'home',
+	    text: '다음 메뉴',
+	    style: 'default'
+      }
+    ]	
+  };
+}
+
 //get
 router.get('/', async (req, res, next) => {
-  // 유저 목록 검색 (1)
   const users = await libKakaoWork.getUserList();
-
-  // 검색된 모든 유저에게 각각 채팅방 생성 (2)
   const conversations = await Promise.all(
     users.map((user) => libKakaoWork.openConversations({ userId: user.id }))
   );
-
-  // 생성된 채팅방에 메세지 전송 (3)
+  
   const messages = await Promise.all([
-    conversations.map((conversation) =>
-      libKakaoWork.sendMessage({
-        conversationId: conversation.id,
-        text: '설문조사 이벤트',
-        blocks: [
-          {
-            type: 'header',
-            text: '☕ 사내 카페 만족도 조사 🥤',
-            style: 'blue',
-          },
-          {
-            type: 'text',
-            text:
-              '어느덧 사내카페가 바뀐지 한달이 되었습니다.\n구르미들이 카페를 이용하고 계신지 의견을 들어보고자 설문 조사를 진행해봅니다!!\n설문에 참여하면 푸짐한 경품 찬스가있으니 상품 꼭 받아가세요! 🎁',
-            markdown: true,
-          },
-          {
-            type: 'button',
-            action_type: 'call_modal',
-            value: 'cafe_survey',
-            text: '설문 참여하기',
-            style: 'default',
-          },
-        ],
-      })
-    ),
+    conversations.map((conversation) => libKakaoWork.sendMessage(handleMainMenu(conversation.id))),
   ]);
 
   // 응답값은 자유롭게 작성하셔도 됩니다.
@@ -50,13 +87,14 @@ router.get('/', async (req, res, next) => {
     conversations,
     messages,
   });
-
 });
 
 //post
 // routes/index.js
 router.post('/request', async (req, res, next) => {
+  console.log('/request called');
   const { message, value } = req.body;
+  console.log(req.body);
 
   switch (value) {
     case 'cafe_survey':
@@ -66,6 +104,7 @@ router.post('/request', async (req, res, next) => {
           title: '설문조사',
           accept: '설문조사 전송하기',
           decline: '취소',
+		  action_name: 'cafe_survey_results',
           value: 'cafe_survey_results',
           blocks: [
             {
@@ -122,63 +161,101 @@ router.post('/request', async (req, res, next) => {
   res.json({});
 });
 
-// routes/index.js
+async function handleSubmission({message, action_time, actions, value}) {
+  console.log('handleSubmissions');
+  await libKakaoWork.sendMessage({
+    conversationId: message.conversation_id,
+    text: '설문조사에 응해주셔서 감사합니다!',
+    blocks: [
+      {
+        type: 'text',
+        text: '설문조사에 응해주셔서 감사합니다! 🎁',
+        markdown: true,
+      },
+      {
+        type: 'text',
+        text: '*답변 내용*',
+        markdown: true,
+      },
+      {
+        type: 'description',
+        term: '평점',
+        content: {
+          type: 'text',
+          text: actions.rating,
+          markdown: false,
+        },
+        accent: true,
+      },
+      {
+        type: 'description',
+        term: '바라는 점',
+        content: {
+        type: 'text',
+          text: actions.wanted,
+          markdown: false,
+        },
+        accent: true,
+      },
+      {
+        type: 'description',
+        term: '시간',
+        content: {
+          type: 'text',
+          text: action_time,
+          markdown: false,
+        },
+        accent: true,
+      },
+    ],	
+  });
+}
+
+async function handleMenuItem({message, menuItemId}) {
+  const menuItemHandler = {
+    'home': handleMainMenu,
+	'menu1': handleMenu1,
+	'menu2': handleMenu1,
+	'menu3': handleMenu1,
+	'menu4': handleMenu1
+  }
+  if (!(menuItemId in menuItemHandler))
+    menuItemId = 'home'
+  await libKakaoWork.sendMessage(menuItemHandler[menuItemId](message.conversation_id))
+}
+
+async function handleSubmitAction({message, action_time, action_name, value}) {
+  console.log('handleSubmitAction');
+  await handleMenuItem({message, menuItemId: value});
+}
+
+async function handleUnsupportedCallback({message, type}) {
+  console.log(`unsupported callback type ${type}`)
+  await libKakaoWork.sendMessage({
+    conversationId: message.conversation_id,
+    text: '콜백 에러',
+    blocks: [
+      {
+        type: 'text',
+        text: `지원되지 않는 콜백 타입 ${type} 입니다.`,
+      },
+    ]
+  });
+}
+
 // routes/index.js
 router.post('/callback', async (req, res, next) => {
-  const { message, actions, action_time, value } = req.body; // 설문조사 결과 확인 (2)
-
-  switch (value) {
-    case 'cafe_survey_results':
-      // 설문조사 응답 결과 메세지 전송 (3)
-      await libKakaoWork.sendMessage({
-        conversationId: message.conversation_id,
-        text: '설문조사에 응해주셔서 감사합니다!',
-        blocks: [
-          {
-            type: 'text',
-            text: '설문조사에 응해주셔서 감사합니다! 🎁',
-            markdown: true,
-          },
-          {
-            type: 'text',
-            text: '*답변 내용*',
-            markdown: true,
-          },
-          {
-            type: 'description',
-            term: '평점',
-            content: {
-              type: 'text',
-              text: actions.rating,
-              markdown: false,
-            },
-            accent: true,
-          },
-          {
-            type: 'description',
-            term: '바라는 점',
-            content: {
-              type: 'text',
-              text: actions.wanted,
-              markdown: false,
-            },
-            accent: true,
-          },
-          {
-            type: 'description',
-            term: '시간',
-            content: {
-              type: 'text',
-              text: action_time,
-              markdown: false,
-            },
-            accent: true,
-          },
-        ],
-      });
-      break;
-    default:
+  console.log('/callback called');
+  const { message, type, actions, action_time, action_name, value } = req.body;
+  console.log(req.body);
+  const callbackHandler = {
+	'submission': handleSubmission,
+    'submit_action': handleSubmitAction,
   }
+  if (type in callbackHandler)
+    callbackHandler[type](req.body);
+  else
+    handleUnsupportedCallback(req.body);
 
   res.json({ result: true });
 });
