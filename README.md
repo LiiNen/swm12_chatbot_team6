@@ -1,6 +1,8 @@
 # swm12_chatbot_team6
 
 <br><br><br>
+## 프로젝트 개요
+<p align="center"><img src="/readme_img/project_intro.png"></p>
 
 ## 팀 정보 (Team Information)
 (이름순, 추후 수정 예정)
@@ -87,7 +89,6 @@
     <td width="175" align="center">
       <a href="mailto:yslim6168@naver.com"><img src="https://img.shields.io/static/v1?label=&message=yslim6168@naver.com&color=green&style=flat-square&logo=gmail"></a>
     </td>
-  </tr>
   </tr>
 </tbody>
 </table>
