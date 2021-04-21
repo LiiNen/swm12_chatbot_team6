@@ -92,7 +92,7 @@ router.get('/', async (req, res, next) => {
 	/* 0번째 구성원(김정훈)에게 챗봇 보내기 */
 	/* 김정훈, 오창환, 임연수, 박찬규, 이병곤 순서로 인덱싱되어있음 */
 	users = await libKakaoWork.getUserList();
-	users = [users[0];
+	users = [users[0]];
 	const conversations = await Promise.all(
 		users.map((user) => libKakaoWork.openConversations({ userId: user.id }))
 	);

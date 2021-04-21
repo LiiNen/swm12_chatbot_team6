@@ -1,13 +1,4 @@
 module.exports = function mainMenuView(conversationId) {
-	const menuItems = [['메뉴1', 'menu1'], ['메뉴2', 'menu2'], ['메뉴3', 'menu3'], ['메뉴4', 'menu4']]
-	.map(([menuName, action_name]) => ({
-		type: 'button',
-		action_type: 'submit_action',
-		action_name,
-		value: action_name,
-		text: menuName,
-		style: 'default'
-	}));
 	const menuItems = [['멘토링 목록', 'menu1', '멘토링 일정', 'menu2'], ['알림설정', 'menu3', '맛집..?', 'menu4']]
 	.map(([menuName1, action_name1, menuName2, action_name2]) => ({
 	type: 'action',
