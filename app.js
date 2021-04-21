@@ -5,6 +5,12 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
+require('dotenv').config()
+
+const Database = require("./database/index.ts").default;
+Database.init();
+
+
 const index = require('./routes/index');
 
 const app = express();
