@@ -14,6 +14,9 @@ Database.init();
 const index = require('./routes/index');
 
 const app = express();
+//const Database = require("./database/index.ts");
+
+//Database.init();
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
