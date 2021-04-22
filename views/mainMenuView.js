@@ -1,4 +1,5 @@
 module.exports = function mainMenuView(conversationId) {
+	tempMentoringIndex = -1; // menu1 재접근시 처음부터 볼수 있도록 홈으로 돌아올 시 다시 -1로 초기화
 	const menuItems = [['멘토링 목록', 'menu1', '멘토링 일정', 'menu2'], ['알림설정', 'menu3', '맛집..?', 'menu4']]
 	.map(([menuName1, action_name1, menuName2, action_name2]) => ({
 	type: 'action',

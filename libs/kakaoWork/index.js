@@ -5,7 +5,7 @@ const axios = require('axios');
 const kakaoInstance = axios.create({
   baseURL: 'https://api.kakaowork.com',
   headers: {
-    Authorization: `Bearer ${process.env.KAKAOWORKS_APP_KEY||Config.keys.kakaoWork.bot}`,
+    Authorization: `Bearer ${Config.keys.kakaoWork.bot}`,
   },
 });
 
