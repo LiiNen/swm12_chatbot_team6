@@ -10,7 +10,7 @@ menuList = ['menu1', 'menu2', 'menu3', 'menu4'];
 mentoring_title = ['[자유멘토링] 4/24(토) 20:00부터 - 프로젝트 기획 아이디어 브레인스토밍 with 10년차 소마 멘토', '[멘토특강] 2021년 4월 25일(일) 15:00 VAR/AI 및 지정프로젝트 설명, 상담회', '[멘토특강] Technical Writing - 개론&각론, 실습포함, 2021년 5월 1일(토) 12:00~16:00', '[멘토특강] DB Modeling & SQL - #2 - 2021년 5월 3일(월) 18:30~22:30', '[자유멘토링] 프로젝트 아이디어 도출/기획검증 - 2021년 5월 1일(토) 17:00~21:00'];
 mentoring_owner = ['김수현', '이민경', '김준범', '김준범', '김준범'];
 mentoring_url = ['https://swmaestro.org/sw/mypage/mentoLec/view.do?qustnrSn=525&menuNo=200046', 'https://swmaestro.org/sw/mypage/mentoLec/view.do?qustnrSn=523&menuNo=200046', 'https://swmaestro.org/sw/mypage/mentoLec/view.do?qustnrSn=516&menuNo=200046', 'https://swmaestro.org/sw/mypage/mentoLec/view.do?qustnrSn=517&menuNo=200046', 'https://swmaestro.org/sw/mypage/mentoLec/view.do?qustnrSn=518&menuNo=200046'];
-mentoring_date = ['2021.04.24', '2021.04.28', '2021.05.01', '2021.05.03', '2021.05.01']
+mentoring_date = ['2021.04.24', '2021.04.28', '2021.05.01', '2021.05.03', '2021.05.01'];
 var temp_mentoring_data = new Array();
 for(i=0;i<5;i++){
 	temp_mentoring_data.push({});
@@ -62,8 +62,7 @@ function menu1View(conversationId) {
 			]	
 		};
 	}
-	const mentoringBlock = temp_mentoring_data_slice
-	.flatMap((mentoring_object) => ([{
+	const mentoringBlock = temp_mentoring_data_slice.flatMap((mentoring_object) => ([{
 		type: 'text',
 		text: `[${mentoring_object['title']}](${mentoring_object['url']})`,
 		markdown: true,
@@ -80,10 +79,10 @@ function menu1View(conversationId) {
 	},
 	{
 		type: 'description',
-		term: '특강일',
+		term: '일자',
 		content: {
 			type: 'text',
-			text: mentoring_object['date'],
+			text: `${mentoring_object['date']}(0000.00.00)`,
 			markdown: false
 		},
 		accent: true
@@ -95,11 +94,6 @@ function menu1View(conversationId) {
 		conversationId,
 		text: '멘토링 목록 조회 결과입니다.',
 		blocks: [
-			{
-				type: 'header',
-				text: '최근 올라온 멘토링 리스트',
-				style: 'blue',
-			},
 			...mentoringBlock,
 			{
 				type: 'action',
@@ -126,7 +120,7 @@ function menu1View(conversationId) {
 	};
 }
 
-//get
+//챗봇 시작
 router.get('/', async (req, res, next) => {
 	// const users = await libKakaoWork.getUserList(); // 구성원 전체에게 챗봇 보내기
 	/* 0번째 구성원(김정훈)에게 챗봇 보내기 */
@@ -163,10 +157,19 @@ async function unsupportedSubmitActionController(req) {
     ]
   });
 }
-
-
 async function menu1Controller(req) {
-  console.log('menu1Controller');
+  const { message } = req.body;
+  await libKakaoWork.sendMessage(menu1View(message.conversation_id))
+}
+async function menu2Controller(req) {
+  const { message } = req.body;
+  await libKakaoWork.sendMessage(menu1View(message.conversation_id))
+}
+async function menu3Controller(req) {
+  const { message } = req.body;
+  await libKakaoWork.sendMessage(menu1View(message.conversation_id))
+}
+async function menu4Controller(req) {
   const { message } = req.body;
   await libKakaoWork.sendMessage(menu1View(message.conversation_id))
 }
@@ -178,9 +181,9 @@ async function handleSubmitAction(req) {
   const submitActionHandler = {
     'home': mainMenuController,
 		'menu1': menu1Controller,
-		'menu2': menu1Controller,
-		'menu3': menu1Controller,
-		'menu4': menu1Controller,
+		'menu2': menu2Controller,
+		'menu3': menu3Controller,
+		'menu4': menu4Controller,
 		'': unsupportedSubmitActionController
   }
   if (!(action_name in submitActionHandler))
