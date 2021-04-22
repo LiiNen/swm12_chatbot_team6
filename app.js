@@ -24,6 +24,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/', index);
+app.use('/api/v1/mentoring',require("./routes/mentoringRouter.ts").default)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

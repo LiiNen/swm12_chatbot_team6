@@ -12,6 +12,9 @@ import {
 import { IUser } from './User';
 
 export interface IMentoring {
+  /**
+   * qustnrSn 입니다
+   */
   index: number;
   title: string;
   applyStartDate:Date;
