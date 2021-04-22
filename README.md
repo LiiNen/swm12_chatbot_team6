@@ -100,5 +100,6 @@
   </tr>
 </tbody>
 </table>
+<br/>
 ## ✔️ Architecture
 <p align="center"><img src="/readme_img/Architecture.png"></p>
