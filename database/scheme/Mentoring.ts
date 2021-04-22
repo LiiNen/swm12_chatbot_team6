@@ -16,7 +16,14 @@ export interface IMentoring {
   title: string;
   applyStartDate:Date;
   applyEndDate:Date;
-  isApplyOpened:boolean;
+  /**
+   * 마감되면 false입니다.
+   */
+  applyOpened:boolean;
+  /**
+   * 글이 지워지면 true입니다.
+   */
+  deleted:boolean;
   applicants?:({applicant:ObjectID|IUser|string, apply_time:Date})[];
   /**
    * may bigger than applicants' length
@@ -42,7 +49,8 @@ export const MentoringSchema: Schema = new Schema({
   title: { type: String, required: true },
   applyStartDate: { type: Date, required: true },
   applyEndDate: { type: Date, required: true },
-  isApplyOpened: { type: Boolean, required: true },
+  applyOpened: { type: Boolean, required: true },
+  deleted: { type: Boolean, default: false },
   eventStartTime: { type: Date, required: true },
   eventEndTime: { type: Date, required: false },
   applicants: { type: Array, required: false },
