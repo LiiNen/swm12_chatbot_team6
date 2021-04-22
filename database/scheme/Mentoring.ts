@@ -9,12 +9,14 @@ import {
 import {
   ObjectID
 } from 'bson';
+import { IUser } from './User';
 
 export interface IMentoring {
   index: number;
   title: string;
   applyStartDate:Date;
   applyEndDate:Date;
+  isApplyOpened:boolean;
   applicants?:({applicant:ObjectID|IUser|string, apply_time:Date})[];
   /**
    * may bigger than applicants' length
@@ -40,6 +42,7 @@ export const MentoringSchema: Schema = new Schema({
   title: { type: String, required: true },
   applyStartDate: { type: Date, required: true },
   applyEndDate: { type: Date, required: true },
+  isApplyOpened: { type: Boolean, required: true },
   eventStartTime: { type: Date, required: true },
   eventEndTime: { type: Date, required: false },
   applicants: { type: Array, required: false },
