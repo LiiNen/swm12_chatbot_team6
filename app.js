@@ -10,7 +10,7 @@ require('dotenv').config()
 const Database = require("./database/index.ts").default;
 Database.init();
 
-
+console.log(Database);
 const index = require('./routes/index');
 
 const app = express();
@@ -43,6 +43,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.json({ err });
 });
+
+
 
 app.listen(process.env.PORT || 3000, () => console.log('Example app listening on port 3000!'));
 
