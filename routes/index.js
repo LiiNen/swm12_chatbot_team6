@@ -145,6 +145,76 @@ async function handleSubmission(req) {
   });
 }
 
+
+// 알림 신청 모달 베이스라인 예제코드
+// 모달은 request로 오는듯
+router.post('/request', async (req, res, next) => {
+  const { message, value } = req.body;
+
+  switch (value) {
+    case 'subscribe_btn':
+      // 설문조사용 모달 전송
+      return res.json({
+        view: {
+          title: '설문조사',
+          accept: '설문조사 전송하기',
+          decline: '취소',
+          value: 'cafe_survey_results',
+          blocks: [
+            {
+              type: 'label',
+              text: '카페 평점을 알려주세요',
+              markdown: false,
+            },
+            {
+              type: 'select',
+              name: 'rating',
+              required: true,
+              options: [
+                {
+                  text: '1점',
+                  value: '1',
+                },
+                {
+                  text: '2점',
+                  value: '2',
+                },
+                {
+                  text: '3점',
+                  value: '3',
+                },
+                {
+                  text: '4점',
+                  value: '4',
+                },
+                {
+                  text: '5점',
+                  value: '5',
+                },
+              ],
+              placeholder: '평점',
+            },
+            {
+              type: 'label',
+              text: '바라는 점이 있다면 알려주세요!',
+              markdown: false,
+            },
+            {
+              type: 'input',
+              name: 'wanted',
+              required: false,
+              placeholder: 'ex) 와플을 팔면 좋겠습니다',
+            },
+          ],
+        },
+      });
+      break;
+    default:
+  }
+
+  res.json({});
+});
+
 // routes/index.js
 router.post('/callback', async (req, res, next) => {
   console.log('/callback called');
