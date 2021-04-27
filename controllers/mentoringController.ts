@@ -14,9 +14,8 @@ export class Controller {
     }else{
       lii=[req.body]
     }   
-    lii.forEach((v,i,a)=>{
-      const doc = new Mentoring(v)
-      doc.save()
+    lii.forEach(async (v,i,a)=>{
+      await Mentoring.updateOne({index: v.index}, v, {upsert: true, setDefaultsOnInsert: true});
     })
     res.status(200).end()    
   }
@@ -42,14 +41,15 @@ export class Controller {
     lii.forEach((v,i,a)=>{
       Mentoring.findOneAndUpdate({index:v.index},v);
     })
-    res.status(200).end()    
+    res.status(200).end()
   }
 
   async delete(
-    req: Request<unknown, unknown, IMentoring>,
+    req: Request<unknown, unknown, {index:number}>,
     res: Response
   ): Promise<void> {
-    throw Error("Not Implemented");
+    await Mentoring.deleteOne({"index":req.body.index});
+    res.status(200).end()
   }
 
 }

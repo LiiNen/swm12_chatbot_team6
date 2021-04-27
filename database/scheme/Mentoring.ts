@@ -48,7 +48,7 @@ export interface IMentoring {
 }
 
 export const MentoringSchema: Schema = new Schema({
-  index: { type: Number, required: true },
+  index: { type: Number, required: true, index: true },
   title: { type: String, required: true },
   applyStartDate: { type: Date, required: true },
   applyEndDate: { type: Date, required: true },

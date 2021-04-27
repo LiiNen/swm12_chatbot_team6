@@ -39,4 +39,4 @@ export interface IUserSchema extends IUser, Document {
 export interface IUserModel extends Model < IUserSchema > {
 }
 
-export default model<IUserSchema>('Student', UserSchema) as IUserModel;
+export default model<IUserSchema>('User', UserSchema) as IUserModel;
