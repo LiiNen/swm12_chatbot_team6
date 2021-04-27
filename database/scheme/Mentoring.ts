@@ -76,4 +76,4 @@ export interface IMentoringSchema extends IMentoring, Document {}
  */
 export interface IMentoringModel extends Model<IMentoringSchema> {}
 
-export default model <IMentoringSchema> ('Student', MentoringSchema) as IMentoringModel;
+export default model <IMentoringSchema> ('Mentoring', MentoringSchema) as IMentoringModel;
