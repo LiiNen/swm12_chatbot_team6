@@ -26,7 +26,7 @@ router.get('/', async (req, res, next) => {
 	/* 0번째 구성원(김정훈)에게 챗봇 보내기 */
 	/* 김정훈, 오창환, 임연수, 박찬규, 이병곤 순서로 인덱싱되어있음 */
 	users = await libKakaoWork.getUserList();
-	users = [users[0], users[2]];
+	users = [users[0], users[2], users[3]];
 	const conversations = await Promise.all(
 		users.map((user) => libKakaoWork.openConversations({ userId: user.id }))
 	);
@@ -175,56 +175,57 @@ router.post('/request', async (req, res, next) => {
       // 설문조사용 모달 전송
       return res.json({
         view: {
-          title: '설문조사',
-          accept: '설문조사 전송하기',
-          decline: '취소',
-          value: 'cafe_survey_results',
-          blocks: [
-            {
-              type: 'label',
-              text: '카페 평점을 알려주세요',
-              markdown: false,
-            },
-            {
-              type: 'select',
-              name: 'rating',
-              required: true,
-              options: [
-                {
-                  text: '1점',
-                  value: '1',
-                },
-                {
-                  text: '2점',
-                  value: '2',
-                },
-                {
-                  text: '3점',
-                  value: '3',
-                },
-                {
-                  text: '4점',
-                  value: '4',
-                },
-                {
-                  text: '5점',
-                  value: '5',
-                },
-              ],
-              placeholder: '평점',
-            },
-            {
-              type: 'label',
-              text: '바라는 점이 있다면 알려주세요!',
-              markdown: false,
-            },
-            {
-              type: 'input',
-              name: 'wanted',
-              required: false,
-              placeholder: 'ex) 와플을 팔면 좋겠습니다',
-            },
-          ],
+          "title": "modal title",
+  "accept": "확인",
+  "decline": "취소",
+  "value": "{request_modal의 응답으로 전송한 value 값}",
+  "blocks": [
+    {
+      "type": "label",
+      "text": "키워드를 선택해주세요.",
+      "markdown": true
+    },
+    {
+      "type": "select",
+      "name": "keyword1",
+      "options": [
+        {
+          "text": "frontend",
+          "value": "frontend"
+        },
+        {
+          "text": "backend",
+          "value": "backend"
+        },
+        {
+          "text": "Blockchain",
+          "value": "blockchain"
+        }
+      ],
+      "required": true,
+      "placeholder": "옵션을 선택해주세요"
+    },
+    {
+      "type": "select",
+      "name": "keyword2",
+      "options": [
+        {
+          "text": "frontend",
+          "value": "frontend"
+        },
+        {
+          "text": "backend",
+          "value": "backend"
+        },
+        {
+          "text": "Blockchain",
+          "value": "blockchain"
+        }
+      ],
+      "required": false,
+      "placeholder": "옵션을 선택해주세요"
+    }
+  ]
         },
       });
       break;
@@ -235,10 +236,13 @@ router.post('/request', async (req, res, next) => {
 });
 
 // routes/index.js
+// const SubscriberManager = require('../controllers/SubscriberManager');
+// const subscriberManager = new SubscriberManager();
 router.post('/callback', async (req, res, next) => {
   console.log('/callback called');
   const { message, type, actions, action_time, action_name, value } = req.body;
   console.log(req.body);
+	//subscriberManager.add(message.user_id, actions);
   const callbackHandler = {
 		'submission': handleSubmission,
     'submit_action': handleSubmitAction,
