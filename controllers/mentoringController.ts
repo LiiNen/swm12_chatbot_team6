@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { FilterQuery } from 'mongoose';
 import Mentoring, { IMentoring, IMentoringSchema } from '../database/scheme/Mentoring';
+import { keywordQueue } from '../service/mentoringService';
 
 export class Controller {
   async create(
@@ -15,7 +16,15 @@ export class Controller {
       lii=[req.body]
     }   
     lii.forEach(async (v,i,a)=>{
-      await Mentoring.updateOne({index: v.index}, v, {upsert: true, setDefaultsOnInsert: true});
+      const res=await Mentoring.findOne({index: v.index});
+      if(res==null){
+        const doc = (new Mentoring(v));
+        doc.save();
+        keywordQueue.add(doc.id);
+      }else{
+        await Mentoring.updateOne({index: v.index}, v);
+      }
+      
     })
     res.status(200).end()    
   }
