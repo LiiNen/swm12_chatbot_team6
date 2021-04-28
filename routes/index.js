@@ -7,6 +7,7 @@ const mainMenuView = require('../views/mainMenuView');
 const menu2View = require('../views/menu2View');
 const mainMenuController = require('../controllers/mainMenuController');
 const mentoringListController = require('../controllers/mentoringListController');
+const callenderController = require('../controllers/callenderController');
 menuList = ['menu1', 'menu2', 'menu3', 'menu4'];
 
 //챗봇 시작
@@ -75,6 +76,10 @@ async function menu4Controller(req) {
   const { message } = req.body;
   await libKakaoWork.sendMessage(menu1View(message.conversation_id))
 }
+async function callenderBtn(req) {
+	const { message } = req.body;
+	await libKakaoWork.sendMessage(callenderView(message.conversation_id))
+}
 
 async function handleSubmitAction(req) {
   console.log('handleSubmitAction');
@@ -86,7 +91,8 @@ async function handleSubmitAction(req) {
 		'menu2': menu2Controller,
 		'menu3': menu3Controller,
 		'menu4': menu4Controller,
-		'': unsupportedSubmitActionController
+		'': unsupportedSubmitActionController,
+		'mentoring_open': callenderBtn
   }
   if (!(action_name in submitActionHandler))
     action_name = '';
