@@ -8,7 +8,6 @@ const menu2View = require('../views/menu2View');
 const mainMenuController = require('../controllers/mainMenuController');
 const mentoringListController = require('../controllers/mentoringListController');
 const callenderController = require('../controllers/callenderController');
-menuList = ['menu1', 'menu2', 'menu3', 'menu4'];
 
 //챗봇 시작
 mentoring_index = -1;
@@ -27,7 +26,7 @@ router.get('/', async (req, res, next) => {
 	/* 0번째 구성원(김정훈)에게 챗봇 보내기 */
 	/* 김정훈, 오창환, 임연수, 박찬규, 이병곤 순서로 인덱싱되어있음 */
 	users = await libKakaoWork.getUserList();
-	users = [users[0]];
+	users = [users[0], users[2]];
 	const conversations = await Promise.all(
 		users.map((user) => libKakaoWork.openConversations({ userId: user.id }))
 	);
