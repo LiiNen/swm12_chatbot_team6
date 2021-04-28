@@ -76,7 +76,7 @@ module.exports = function mentoringListController(conversationId) {
 		action_type: 'submit_action',
 		action_name: 'mentoring_open',
 		value: JSON.stringify(mentoring_object),
-		text: '자세히 보기',
+		text: '구글 캘린더에 일정 추가하기',
 		style: 'default'
 	},
 	{
