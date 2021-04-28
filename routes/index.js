@@ -4,11 +4,23 @@ const router = express.Router();
 const libKakaoWork = require('../libs/kakaoWork');
 
 const mainMenuView = require('../views/mainMenuView');
+const menu2View = require('../views/menu2View');
 const mainMenuController = require('../controllers/mainMenuController');
 const mentoringListController = require('../controllers/mentoringListController');
 menuList = ['menu1', 'menu2', 'menu3', 'menu4'];
 
 //챗봇 시작
+mentoring_index = -1;
+mentoring_json = [];
+
+function mentoringDataQuery() {
+	const Mentoring = require('../database/scheme/Mentoring').default;
+	mentoring_query = Mentoring.find()
+		.select('index title applyStartDate applyEndDate applyOpended eventStartTime mentor').sort({index: 'desc'});
+	mentoring_query.exec().then((x)=>{mentoring_json = [...x]});
+}
+mentoringDataQuery();
+
 router.get('/', async (req, res, next) => {
 	// const users = await libKakaoWork.getUserList(); // 구성원 전체에게 챗봇 보내기
 	/* 0번째 구성원(김정훈)에게 챗봇 보내기 */
@@ -51,7 +63,9 @@ async function mentoringListBtn(req) {
 }
 async function menu2Controller(req) {
   const { message } = req.body;
-  await libKakaoWork.sendMessage(menu1View(message.conversation_id))
+	console.log("message Send in menu2Controller");
+	console.log(menu2View);
+  await libKakaoWork.sendMessage(menu2View(message.conversation_id))
 }
 async function menu3Controller(req) {
   const { message } = req.body;
