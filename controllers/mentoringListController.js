@@ -75,7 +75,7 @@ module.exports = function mentoringListController(conversationId) {
 		type: 'button',
 		action_type: 'submit_action',
 		action_name: 'mentoring_open',
-		value: String(mentoring_object['index']),
+		value: JSON.stringify(mentoring_object),
 		text: '자세히 보기',
 		style: 'default'
 	},

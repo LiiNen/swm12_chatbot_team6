@@ -1,4 +1,9 @@
-module.exports = function callenderController(conversationId) {
+module.exports = function callenderController(conversationId, responsebody) {
+	console.log('-----');
+	response_json = JSON.stringify(responsebody.value);
+	console.log(responsebody.value);
+	console.log(response_json['index']);
+	console.log('-----');
 	return {
 		conversationId,
 		text: '멘토링 목록 조회를 마쳤습니다.',

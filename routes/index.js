@@ -78,7 +78,7 @@ async function menu4Controller(req) {
 }
 async function callenderBtn(req) {
 	const { message } = req.body;
-	await libKakaoWork.sendMessage(callenderView(message.conversation_id))
+	await libKakaoWork.sendMessage(callenderController(message.conversation_id, req.body))
 }
 
 async function handleSubmitAction(req) {
