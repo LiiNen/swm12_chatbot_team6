@@ -102,7 +102,7 @@
 </table>
 
 <br><br>
-## 챗봇 홈 화면
+## [멘토링 헬퍼] 홈 화면
 <p align="center"><img src="/readme_img/chatbot_home.png"></p>
 
 ## ✔️ Architecture
