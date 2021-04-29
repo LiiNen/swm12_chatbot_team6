@@ -34,3 +34,12 @@ exports.sendMessage = async ({ conversationId, text, blocks }) => {
   const res = await kakaoInstance.post('/v1/messages.send', data);
   return res.data.message;
 };
+	
+//userid 바탕으로 해당 유저 정보 가져오기
+exports.getUserInfo = async ({ userId }) => {
+	const data = {
+		user_id: userId,
+	};
+	const res = await kakaoInstance.get('/v1/users.info', data);
+	return res.data.user;
+}
