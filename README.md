@@ -117,6 +117,6 @@
 ### 멘토링 알림 신청하기
 <p>원하는 키워드를 설정하고 해당 키워드와 관련있는 멘토링이 새로 등록되었을 경우 알림을 받을 수 있습니다.</p>
 
-
+<br><br>
 ## ✔️ Architecture
 <p align="center"><img src="/readme_img/Architecture.png"></p>
