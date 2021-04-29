@@ -9,6 +9,16 @@ function dateFormatterForCalendar(input) {
 	return `${date.getFullYear()}${date_month}${date_date}`;
 }
 
+
+
+function textReductionForCalendar(title) {
+	if (title.length > 50) {
+		title = title.substr(0, 50);
+	}
+	return title;
+}
+
+
 function makeTime(obj){
 	var res = "";
 	if(obj.endDay == "") 
@@ -34,6 +44,10 @@ function makeUrl(obj){
 	else
 		res += "&location=" + obj.location;
 	
+	res = res.replace(/,/gi,"%20");
+	res = res.replace(/~/gi,"%20");
+	res = res.replace(/\(/gi,"%20");
+	res = res.replace(/\)/gi,"%20");
 	return res;
 }
 
@@ -43,14 +57,15 @@ module.exports = function callenderView(conversationId, responsebody) {
 	response_json = JSON.parse(responsebody.value);
 	
 	var calendarObj = {titlecal : "",startDay: "", startTime: "",endDay: "",endTime: "",contents: "",location: ""}
-	calendarObj.titlecal = response_json['title'];
+	calendarObj.titlecal = textReductionForCalendar(response_json['title']);
 	calendarObj.startDay = dateFormatterForCalendar(response_json['eventStartTime']);
 	calendarObj.startTime = "" ;
 	calendarObj.endDay = "";
 	calendarObj.endTime = "";
-	calendarObj.contents = "시간을 확인해 주세요!";
-	
+	calendarObj.contents = "";//response_json['title'];
+	console.log(calendarObj);
 	var url = makeUrl(calendarObj);
+	console.log(url);
 	return {
 		conversationId,
 		text: '구글 캘린더 바로가기.',
@@ -62,7 +77,12 @@ module.exports = function callenderView(conversationId, responsebody) {
 			},
 			{
 				type: 'text',
-				text: `멘토링을 조회하셨네요! 조회한 멘토링을 간편하게 구글 캘린더에 등록해보세요.\n날짜, 내용이 자동으로 입력됩니다.\n\n [지금 구글 캘린더에 추가하시겠어요?](${String(url)}) `,
+				text: ` 조회한 멘토링을 간편하게 구글 캘린더에 등록해보세요.\n`,
+				markdown: true
+			},
+			{
+				type: 'text',
+				text: ` [지금 구글 캘린더에 추가하시겠어요?](${url})`,
 				markdown: true
 			},
 			{

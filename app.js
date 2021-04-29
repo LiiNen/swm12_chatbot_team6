@@ -10,7 +10,6 @@ require('dotenv').config()
 const Database = require("./database/index.ts").default;
 Database.init();
 
-console.log(Database);
 const index = require('./routes/index');
 
 const app = express();

@@ -1,6 +1,7 @@
 import Queue from 'bull';
 import Mentoring from '../database/scheme/Mentoring';
 import User from '../database/scheme/User';
+import kakaoiapi from '../kakaoiapi';
 
 const keywordQueue=Queue('keyword querying queue')
 const notiSendQueue=Queue('notification send queue')
@@ -59,6 +60,7 @@ notiSendQueue.process(async function(job, done){
   const mentoringInfo = await Mentoring.findById(job.data.mentoring)
 
   // plz write send code here
+<<<<<<< HEAD
 	console.log(userInfo);
 	console.log(triggeredwords);
 	console.log(mentoringInfo);
@@ -69,6 +71,11 @@ notiSendQueue.process(async function(job, done){
 	//await libKakaoWork.sendMessage(alamView());
 
   done();
+=======
+  const conver_room = await kakaoiapi.conversations.open(Number.parseInt(userInfo.worksID))
+  await kakaoiapi.messages.send(conver_room.id,mentoringInfo.title+"!!!! wa!!!!")
+  done()
+>>>>>>> 043483d881bfb113e5f7c52377b69eb2dcc15f65
 });
 
 export {
