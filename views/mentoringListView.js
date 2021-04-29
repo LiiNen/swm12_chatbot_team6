@@ -9,8 +9,8 @@ function dateFormatter(date) {
 }
 
 function textReduction(title) {
-	if (title.length > 80) {
-		title = title.substr(0, 75) + ' ...';
+	if (title.length > 75) {
+		title = title.substr(0, 73) + ' ...';
 	}
 	return title;
 }

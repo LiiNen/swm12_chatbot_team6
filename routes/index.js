@@ -4,20 +4,25 @@ const router = express.Router();
 const libKakaoWork = require('../libs/kakaoWork');
 
 const mainMenuView = require('../views/mainMenuView');
-const menu2View = require('../views/menu2View');
+//const alamView = require('../views/alamView');
 const mainMenuController = require('../controllers/mainMenuController');
 const mentoringListView = require('../views/mentoringListView');
 const callenderView = require('../views/callenderView');
+const deletedListView = require('../views/deletedListView');
 
 //챗봇 시작
 mentoring_index = -1;
 mentoring_json = [];
+deleted_index = -1;
+deleted_json = [];
 
 function mentoringDataQuery() {
 	const Mentoring = require('../database/scheme/Mentoring').default;
 	mentoring_query = Mentoring.find()
 		.select('index title applyStartDate applyEndDate applyOpended eventStartTime mentor').sort({index: 'desc'});
 	mentoring_query.exec().then((x)=>{mentoring_json = [...x]});
+	deleted_query = Mentoring.find().where('deleted').in([true]).sort({index: 'desc'}).select('index title');
+	deleted_query.exec().then((x)=>{deleted_json = [...x]});
 }
 mentoringDataQuery();
 
@@ -65,11 +70,12 @@ async function callenderBtn(req) {
 	const { message } = req.body;
 	await libKakaoWork.sendMessage(callenderView(message.conversation_id, req.body))
 }
+const {keywordQueue, notiSendQueue} = require('../service/mentoringService');
 async function menu2Controller(req) {
   const { message } = req.body;
 	console.log("message Send in menu2Controller");
-	console.log(menu2View);
-  await libKakaoWork.sendMessage(menu2View(message.conversation_id))
+	notiSendQueue;
+  //await libKakaoWork.sendMessage(alamView(message.conversation_id))
 }
 async function menu3Controller(req) {
   const { message } = req.body;
@@ -95,7 +101,8 @@ async function handleSubmitAction(req) {
 		'menu3': menu3Controller,
 		'menu4': menu4Controller,
 		'': unsupportedSubmitActionController,
-		'mentoring_open': callenderBtn
+		'mentoring_open': callenderBtn,
+		'deleted_list_btn': deletedListBtn
   }
   if (!(action_name in submitActionHandler))
     action_name = '';
@@ -243,14 +250,12 @@ router.post('/request', async (req, res, next) => {
 // const SubscriberManager = require('../controllers/SubscriberManager');
 // const subscriberManager = new SubscriberManager();
 
-const {keywordQueue, notiSendQueue} = require('../service/mentoringService');
 router.post('/callback', async (req, res, next) => {
   console.log('/callback called');
   const { message, type, actions, action_time, action_name, value } = req.body;
   console.log(req.body);
 	//subscriberManager.add(message.user_id, actions);
-	console.log(keywordQueue);
-	console.log(notiSendQueue);
+
   const callbackHandler = {
 		'submission': handleSubmission,
     'submit_action': handleSubmitAction,
