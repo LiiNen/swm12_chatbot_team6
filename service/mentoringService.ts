@@ -5,6 +5,9 @@ import User from '../database/scheme/User';
 const keywordQueue=Queue('keyword querying queue')
 const notiSendQueue=Queue('notification send queue')
 
+const libKakaoWork = require('../libs/kakaoWork');
+const alamView = require('../views/alamView');
+
 function intersect(a, b) {
   var setB = new Set(b);
   return [...new Set(a)].filter(x => setB.has(x));
@@ -56,8 +59,16 @@ notiSendQueue.process(async function(job, done){
   const mentoringInfo = await Mentoring.findById(job.data.mentoring)
 
   // plz write send code here
+	console.log(userInfo);
+	console.log(triggeredwords);
+	console.log(mentoringInfo);
+	libKakaoWork.sendMessage(alamView(userInfo));
+	
+	const conversation = await libKakaoWork.openConversations({ userId: userInfo })
+	await libKakaoWork.sendMessage(alamView(conversation.id, mentoringInfo));
+	//await libKakaoWork.sendMessage(alamView());
 
-  done()
+  done();
 });
 
 export {

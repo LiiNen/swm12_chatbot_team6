@@ -12,6 +12,12 @@
 <p align="center"><img src="/readme_img/project_intro.png"></p>
 
 <br><br>
+## 기능 구현
+1. 멘토링 목록 조회 -> 해당 페이지 이동 (-> 구글 캘린더에 추가하기)
+2. 멘토링 알림 신청 등록 -> 키워드 / 알림시간 등록 -> db업데이트 / 시간 맞추어 userid에 메세지 전송
+3. 취소된 멘토링 확인 -> 목록 조회, 해당 페이지 이동 가능
+
+<br><br>
 ## 팀 정보 (Team Information)
 (이름순, 추후 수정 예정)
 <table width="788">
