@@ -1,6 +1,7 @@
 module.exports = function mainMenuView(conversationId) {
 	mentoring_index = -1; // menu1 재접근시 처음부터 볼수 있도록 홈으로 돌아올 시 다시 -1로 초기화
-	const menuItems = [['멘토링 목록', 'mentoring_list_btn', '멘토링 일정', 'menu2'], ['알림설정', 'menu3', '맛집..?', 'menu4']]
+	deleted_index = -1;
+	const menuItems = [['멘토링 목록', 'mentoring_list_btn', '멘토링 일정', 'menu2'], ['취소된 멘토링', 'deleted_list_btn', '맛집..?', 'menu4']]
 	.map(([menuName1, action_name1, menuName2, action_name2]) => ({
 	type: 'action',
 	elements: [
@@ -25,16 +26,15 @@ module.exports = function mainMenuView(conversationId) {
 
   return {
     conversationId,
-    text: '소마 멘토링 ',
+    text: '소마 멘토링 헬퍼',
     blocks: [
       {
-        type: 'header',
-        text: '소마 멘토링 봇',
-        style: 'blue',
+        type: 'image_link',
+        url: 'https://raw.githubusercontent.com/LiiNen/swm12_chatbot_team6/main/service_img/logo_made.png'
       },
       {
         type: 'text',
-        text: '메뉴를 선택해주세요!',
+        text: '안녕하세요, 멘토링 헬퍼입니다😀\n예비 연수기간 중, 멘토링 조회 및 신청을 도와주는 \'멘토링 헬퍼\'입니다.\n듣고싶은 멘토링, 놓치지 마세요!',
         markdown: true,
       },
 	  ...menuItems,
