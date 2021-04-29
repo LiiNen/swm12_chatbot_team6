@@ -1,18 +1,18 @@
 // index title applyStartDate applyEndDate applyOpended eventStartTime mentor
 
-/*
-function dateFormatterForCalendar(date) {
+function dateFormatterForCalendar(input) {
+	var date = new Date(input);
 	date_month = date.getMonth()+1;
 	if (date_month < 10) date_month = '0' + date_month;
 	date_date = date.getDate();
 	if (date_date < 10) date_date = '0' + date_date;
 	return `${date.getFullYear()}${date_month}${date_date}`;
-}*/
+}
 
 function makeTime(obj){
 	var res = "";
 	if(obj.endDay == "") 
-		res = obj.startDay + "/" + obj.startDay;
+		res = obj.startDay + "T" + "000000" + "/" + obj.startDay+ "T" + "235959" ;
 	else if(obj.startTime == "")
 		res = obj.startDay + "/" + obj.endDay;
 	else if (obj.endTime == "")
@@ -24,15 +24,6 @@ function makeTime(obj){
 
 
 function makeUrl(obj){
-
-	
-	console.log(obj.titlecal);
-	console.log(obj.startDay);
-	console.log(obj.startTime);
-	console.log(obj.endDay);
-	console.log(obj.endTime);
-	console.log(obj.contents);
-	
 	var res = "https://calendar.google.com/calendar/render?";
 	res += "action=TEMPLATE";
 	res += "&text=" + encodeURI(obj.titlecal);
@@ -47,18 +38,16 @@ function makeUrl(obj){
 }
 
 
-module.exports = function callenderController(conversationId, responsebody) {
+module.exports = function callenderView(conversationId, responsebody) {
 	console.log('-----');
 	response_json = JSON.parse(responsebody.value);
-	console.log('value');
+	console.log(responsebody);
 	console.log(responsebody.value);
-	console.log('-----');
 	console.log(response_json['index']);
 	
-	
 	var calendarObj = {titlecal : "",startDay: "", startTime: "",endDay: "",endTime: "",contents: "",location: ""}
-	calendarObj.titlecal = responsebody['title'];
-	calendarObj.startDay = "";//dateFormatterForCalendar(responsebody['eventStartTime']);
+	calendarObj.titlecal = response_json['title'];
+	calendarObj.startDay = dateFormatterForCalendar(response_json['eventStartTime']);
 	calendarObj.startTime = "" ;
 	calendarObj.endDay = "";
 	calendarObj.endTime = "";

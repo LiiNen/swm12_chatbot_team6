@@ -15,7 +15,7 @@ function textReduction(title) {
 	return title;
 }
 
-module.exports = function mentoringListController(conversationId) {
+module.exports = function mentoringListView(conversationId) {
 	mentoring_index++;
 	// 멘토링 리스트 전부 탐색한 이후
 	mentoring_json_slice = mentoring_json.slice(mentoring_index*5, (mentoring_index+1)*5);

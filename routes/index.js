@@ -6,8 +6,8 @@ const libKakaoWork = require('../libs/kakaoWork');
 const mainMenuView = require('../views/mainMenuView');
 const menu2View = require('../views/menu2View');
 const mainMenuController = require('../controllers/mainMenuController');
-const mentoringListController = require('../controllers/mentoringListController');
-const callenderController = require('../controllers/callenderController');
+const mentoringListView = require('../views/mentoringListView');
+const callenderView = require('../views/callenderView');
 
 //챗봇 시작
 mentoring_index = -1;
@@ -26,7 +26,7 @@ router.get('/', async (req, res, next) => {
 	/* 0번째 구성원(김정훈)에게 챗봇 보내기 */
 	/* 김정훈, 오창환, 임연수, 박찬규, 이병곤 순서로 인덱싱되어있음 */
 	users = await libKakaoWork.getUserList();
-	users = [users[0], users[2], users[3]];
+	users = [users[0]];
 	const conversations = await Promise.all(
 		users.map((user) => libKakaoWork.openConversations({ userId: user.id }))
 	);
@@ -59,7 +59,11 @@ async function unsupportedSubmitActionController(req) {
 }
 async function mentoringListBtn(req) {
   const { message } = req.body;
-  await libKakaoWork.sendMessage(mentoringListController(message.conversation_id))
+  await libKakaoWork.sendMessage(mentoringListView(message.conversation_id))
+}
+async function callenderBtn(req) {
+	const { message } = req.body;
+	await libKakaoWork.sendMessage(callenderView(message.conversation_id, req.body))
 }
 async function menu2Controller(req) {
   const { message } = req.body;
@@ -75,9 +79,9 @@ async function menu4Controller(req) {
   const { message } = req.body;
   await libKakaoWork.sendMessage(menu1View(message.conversation_id))
 }
-async function callenderBtn(req) {
+async function deletedListBtn(req) {
 	const { message } = req.body;
-	await libKakaoWork.sendMessage(callenderController(message.conversation_id, req.body))
+  await libKakaoWork.sendMessage(deletedListView(message.conversation_id))
 }
 
 async function handleSubmitAction(req) {
@@ -238,11 +242,15 @@ router.post('/request', async (req, res, next) => {
 // routes/index.js
 // const SubscriberManager = require('../controllers/SubscriberManager');
 // const subscriberManager = new SubscriberManager();
+
+const {keywordQueue, notiSendQueue} = require('../service/mentoringService');
 router.post('/callback', async (req, res, next) => {
   console.log('/callback called');
   const { message, type, actions, action_time, action_name, value } = req.body;
   console.log(req.body);
 	//subscriberManager.add(message.user_id, actions);
+	console.log(keywordQueue);
+	console.log(notiSendQueue);
   const callbackHandler = {
 		'submission': handleSubmission,
     'submit_action': handleSubmitAction,
