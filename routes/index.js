@@ -31,7 +31,7 @@ router.get('/', async (req, res, next) => {
 	/* 0번째 구성원(김정훈)에게 챗봇 보내기 */
 	/* 김정훈, 오창환, 임연수, 박찬규, 이병곤 순서로 인덱싱되어있음 */
 	users = await libKakaoWork.getUserList();
-	users = [users[0]];
+	users = [users[0], users[1]];
 	const conversations = await Promise.all(
 		users.map((user) => libKakaoWork.openConversations({ userId: user.id }))
 	);
@@ -184,57 +184,29 @@ router.post('/request', async (req, res, next) => {
       // 설문조사용 모달 전송
       return res.json({
         view: {
-          "title": "modal title",
-  "accept": "확인",
-  "decline": "취소",
-  "value": "{request_modal의 응답으로 전송한 value 값}",
-  "blocks": [
-    {
-      "type": "label",
-      "text": "키워드를 선택해주세요.",
-      "markdown": true
-    },
-    {
-      "type": "select",
-      "name": "keyword1",
-      "options": [
-        {
-          "text": "frontend",
-          "value": "frontend"
-        },
-        {
-          "text": "backend",
-          "value": "backend"
-        },
-        {
-          "text": "Blockchain",
-          "value": "blockchain"
-        }
-      ],
-      "required": true,
-      "placeholder": "옵션을 선택해주세요"
-    },
-    {
-      "type": "select",
-      "name": "keyword2",
-      "options": [
-        {
-          "text": "frontend",
-          "value": "frontend"
-        },
-        {
-          "text": "backend",
-          "value": "backend"
-        },
-        {
-          "text": "Blockchain",
-          "value": "blockchain"
-        }
-      ],
-      "required": false,
-      "placeholder": "옵션을 선택해주세요"
-    }
-  ]
+					"title": "키워드 등록",
+					"accept": "확인",
+					"decline": "취소",
+					"value": "{request_modal의 응답으로 전송한 value 값}",
+					
+					"blocks": [
+					{
+						"type": "label",
+						"text": "키워드를 입력해주세요\n",
+						"markdown": true
+					},
+					{
+						"type": "input",
+						"name": "keyword",
+						"required": false,
+						"placeholder": "ex) FE, blockchain, ..."
+					},
+					{
+						"type": "label",
+						"text": "\n\n작성하신 내용은 쉼표(,)로 구분되어 DB에 저장됩니다. 해당 키워드가 포함된 게시글이 올라오면, 멘토링 헬퍼가 알려드리겠습니다.\n\n이미 키워드를 입력한 적이 있으시다면\n1. 새로 입력한 키워드로 덮어씌웁니다.\n2. 빈칸일 경우 알림 구독을 취소합니다.",
+						"markdown": true
+					}
+					]
         },
       });
       break;
@@ -253,7 +225,11 @@ router.post('/callback', async (req, res, next) => {
   const { message, type, actions, action_time, action_name, value } = req.body;
   console.log(req.body);
 	//subscriberManager.add(message.user_id, actions);
-
+	
+	// actions.keyword의 경우 modal 이외의 버튼을 눌렀을 때는 없는 값입니다! 예외처리 부탁드려요!
+	// console.log("user이름 : ", message.user_id);
+	// console.log("user설정 : ", actions.keyword);
+	
   const callbackHandler = {
 		'submission': handleSubmission,
     'submit_action': handleSubmitAction,
