@@ -41,9 +41,6 @@ function makeUrl(obj){
 module.exports = function callenderView(conversationId, responsebody) {
 	console.log('-----');
 	response_json = JSON.parse(responsebody.value);
-	console.log(responsebody);
-	console.log(responsebody.value);
-	console.log(response_json['index']);
 	
 	var calendarObj = {titlecal : "",startDay: "", startTime: "",endDay: "",endTime: "",contents: "",location: ""}
 	calendarObj.titlecal = response_json['title'];
@@ -54,8 +51,6 @@ module.exports = function callenderView(conversationId, responsebody) {
 	calendarObj.contents = "시간을 확인해 주세요!";
 	
 	var url = makeUrl(calendarObj);
-	
-	
 	return {
 		conversationId,
 		text: '구글 캘린더 바로가기.',
@@ -67,7 +62,7 @@ module.exports = function callenderView(conversationId, responsebody) {
 			},
 			{
 				type: 'text',
-				text: `멘토링을 조회하셨네요! 조회한 멘토링을 간편하게 구글 캘린더에 등록해보세요.\n날짜, 내용이 자동으로 입력됩니다.\n\n[지금 구글 캘린더에 추가하시겠어요?](${url})`,
+				text: `멘토링을 조회하셨네요! 조회한 멘토링을 간편하게 구글 캘린더에 등록해보세요.\n날짜, 내용이 자동으로 입력됩니다.\n\n [지금 구글 캘린더에 추가하시겠어요?](${String(url)}) `,
 				markdown: true
 			},
 			{

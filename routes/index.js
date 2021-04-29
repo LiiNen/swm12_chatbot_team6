@@ -70,12 +70,10 @@ async function callenderBtn(req) {
 	const { message } = req.body;
 	await libKakaoWork.sendMessage(callenderView(message.conversation_id, req.body))
 }
-const {keywordQueue, notiSendQueue} = require('../service/mentoringService');
+
 async function menu2Controller(req) {
   const { message } = req.body;
 	console.log("message Send in menu2Controller");
-	notiSendQueue;
-  //await libKakaoWork.sendMessage(alamView(message.conversation_id))
 }
 async function menu3Controller(req) {
   const { message } = req.body;

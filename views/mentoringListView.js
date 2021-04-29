@@ -82,6 +82,7 @@ module.exports = function mentoringListView(conversationId) {
 	{
 		type: 'divider'
 	}]));
+	mentoringBlock.pop();
   return {
 		conversationId,
 		text: '멘토링 목록 조회 결과입니다.',
