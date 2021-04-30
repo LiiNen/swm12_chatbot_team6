@@ -107,3 +107,6 @@ configs
 
 # IDE files
 .vscode
+
+secretaccount.py
+dump.rdb

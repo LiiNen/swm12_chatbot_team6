@@ -15,6 +15,19 @@ exports.getUserList = async () => {
   return res.data.users;
 };
 
+// 유저 1회 확인
+exports.getUserListFirst = async () => {
+  const res = await kakaoInstance.get('/v1/users.list?limit=100');
+  return res.data;
+};
+
+// cursor 이용한 2회차부터의 확인
+exports.getUserListCursor = async ({cursor}) => {
+  const res = await kakaoInstance.get('/v1/users.list?cursor=' + cursor);
+  return res.data;
+};
+
+
 // 채팅방 생성 (2)
 exports.openConversations = async ({ userId }) => {
   const data = {
@@ -34,12 +47,3 @@ exports.sendMessage = async ({ conversationId, text, blocks }) => {
   const res = await kakaoInstance.post('/v1/messages.send', data);
   return res.data.message;
 };
-	
-//userid 바탕으로 해당 유저 정보 가져오기
-exports.getUserInfo = async ({ userId }) => {
-	const data = {
-		user_id: userId,
-	};
-	const res = await kakaoInstance.get('/v1/users.info', data);
-	return res.data.user;
-}

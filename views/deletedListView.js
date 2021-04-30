@@ -1,8 +1,9 @@
 // index, title
 
 function textReduction(title) {
-	if (title.length > 80) {
-		title = title.substr(0, 75) + ' ...';
+	title = title.replace(/~/g, '〜');
+	if (title.length > 73) {
+		title = title.substr(0, 70) + ' ...';
 	}
 	return title;
 }
@@ -52,8 +53,13 @@ module.exports = function deletedListView(conversationId) {
 		text: '취소된 멘토링 조회 결과입니다.',
 		blocks: [
 			{
+				type: "header",
+				text: "일정 취소된 멘토링 목록",
+				style: "red"
+			},
+			{
 				type: 'text',
-				text: '최근 취소된 멘토링의 제목입니다.\n링크를 클릭해 상세 정보를 확인할 수 있습니다.',
+				text: '최근 취소된 멘토링의 제목입니다.\n링크에서 상세 정보를 확인 가능합니다.',
 				markdown: true
 			},
 			...deletedBlock,

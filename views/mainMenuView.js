@@ -1,6 +1,8 @@
 module.exports = function mainMenuView(conversationId) {
+	
 	mentoring_index = -1; // menu1 재접근시 처음부터 볼수 있도록 홈으로 돌아올 시 다시 -1로 초기화
 	deleted_index = -1;
+	
 	const menuItems = [['멘토링 목록', 'mentoring_list_btn', '취소된 멘토링', 'deleted_list_btn']]
 	.map(([menuName1, action_name1, menuName2, action_name2]) => ({
 	type: 'action',
@@ -23,11 +25,10 @@ module.exports = function mainMenuView(conversationId) {
 		}
 	]
 	}));
-	
 
   return {
     conversationId,
-    text: '소마 멘토링 헬퍼',
+    text: '멘토링 신청 도와줘! 멘토링 헬퍼😎',
     blocks: [
       {
         type: 'image_link',

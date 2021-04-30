@@ -7,46 +7,21 @@ const mainMenuView = require('../views/mainMenuView');
 //const alamView = require('../views/alamView');
 const mainMenuController = require('../controllers/mainMenuController');
 const mentoringListView = require('../views/mentoringListView');
+const mentoringListAlertView = require('../views/mentoringListAlertView');
 const callenderView = require('../views/callenderView');
 const deletedListView = require('../views/deletedListView');
 
+const Mentoring = require('../database/scheme/Mentoring').default;
+
 //챗봇 시작
+
+router.post('/chatbot', mainMenuController.mainMenuInit);
+router.get('/', mainMenuController.mainMenuInit);
+
 mentoring_index = -1;
 mentoring_json = [];
 deleted_index = -1;
 deleted_json = [];
-
-function mentoringDataQuery() {
-	const Mentoring = require('../database/scheme/Mentoring').default;
-	mentoring_query = Mentoring.find()
-		.select('index title applyStartDate applyEndDate applyOpended eventStartTime mentor').sort({index: 'desc'});
-	mentoring_query.exec().then((x)=>{mentoring_json = [...x]});
-	deleted_query = Mentoring.find().where('deleted').in([true]).sort({index: 'desc'}).select('index title');
-	deleted_query.exec().then((x)=>{deleted_json = [...x]});
-}
-mentoringDataQuery();
-
-router.get('/', async (req, res, next) => {
-	// const users = await libKakaoWork.getUserList(); // 구성원 전체에게 챗봇 보내기
-	/* 0번째 구성원(김정훈)에게 챗봇 보내기 */
-	/* 김정훈, 오창환, 임연수, 박찬규, 이병곤 순서로 인덱싱되어있음 */
-	users = await libKakaoWork.getUserList();
-	users = [users[0], users[1]];
-	const conversations = await Promise.all(
-		users.map((user) => libKakaoWork.openConversations({ userId: user.id }))
-	);
-  
-  const messages = await Promise.all([
-    conversations.map((conversation) => libKakaoWork.sendMessage(mainMenuView(conversation.id))),
-  ]);
-
-  // 응답값은 자유롭게 작성하셔도 됩니다.
-  res.json({
-    users,
-    conversations,
-    messages,
-  });
-});
 
 async function unsupportedSubmitActionController(req) {
   const { message, action_name } = req.body
@@ -62,29 +37,34 @@ async function unsupportedSubmitActionController(req) {
     ]
   });
 }
+async function mentoringDataQuery() {
+	mentoring_json = await Mentoring.find()
+		.select('index title applyStartDate applyEndDate applyOpended eventStartTime mentor').sort({index: 'desc'});
+	deleted_json = await Mentoring.find().where('deleted').in([true]).sort({index: 'desc'}).select('index title');
+}
 async function mentoringListBtn(req) {
   const { message } = req.body;
+	await mentoringDataQuery();
   await libKakaoWork.sendMessage(mentoringListView(message.conversation_id))
+}
+async function mentoringListBtnReturn(req) {
+  mentoring_index -= 2;
+	if (mentoring_index <= -1) {
+		const { message } = req.body;
+  	await libKakaoWork.sendMessage(mentoringListAlertView(message.conversation_id))
+	}
+	else{
+		const { message } = req.body;
+  	await libKakaoWork.sendMessage(mentoringListView(message.conversation_id))
+	}
 }
 async function callenderBtn(req) {
 	const { message } = req.body;
 	await libKakaoWork.sendMessage(callenderView(message.conversation_id, req.body))
 }
-
-async function menu2Controller(req) {
-  const { message } = req.body;
-	console.log("message Send in menu2Controller");
-}
-async function menu3Controller(req) {
-  const { message } = req.body;
-  await libKakaoWork.sendMessage(menu1View(message.conversation_id))
-}
-async function menu4Controller(req) {
-  const { message } = req.body;
-  await libKakaoWork.sendMessage(menu1View(message.conversation_id))
-}
 async function deletedListBtn(req) {
 	const { message } = req.body;
+	await mentoringDataQuery();
   await libKakaoWork.sendMessage(deletedListView(message.conversation_id))
 }
 
@@ -93,14 +73,12 @@ async function handleSubmitAction(req) {
   const { action_name } = req.body;
   console.log('action_name', action_name);
   const submitActionHandler = {
-    'home': mainMenuController,
+    'home': mainMenuController.mainMenuController,
 		'mentoring_list_btn': mentoringListBtn,
-		'menu2': menu2Controller,
-		'menu3': menu3Controller,
-		'menu4': menu4Controller,
-		'': unsupportedSubmitActionController,
+		'mentoring_list_btn_return': mentoringListBtnReturn,
 		'mentoring_open': callenderBtn,
-		'deleted_list_btn': deletedListBtn
+		'deleted_list_btn': deletedListBtn,
+		'': unsupportedSubmitActionController,
   }
   if (!(action_name in submitActionHandler))
     action_name = '';
@@ -123,54 +101,80 @@ async function handleUnsupportedCallback({message, type}) {
 
 
 async function handleSubmission(req) {
-  const {message, action_time, actions, value} = req.body;
-  console.log('handleSubmissions');
-  await libKakaoWork.sendMessage({
-    conversationId: message.conversation_id,
-    text: '설문조사에 응해주셔서 감사합니다!',
-    blocks: [
-      {
-        type: 'text',
-        text: '설문조사에 응해주셔서 감사합니다! 🎁',
-        markdown: true,
-      },
-      {
-        type: 'text',
-        text: '*답변 내용*',
-        markdown: true,
-      },
-      {
-        type: 'description',
-        term: '평점',
-        content: {
-          type: 'text',
-          text: actions.rating,
-          markdown: false,
-        },
-        accent: true,
-      },
-      {
-        type: 'description',
-        term: '바라는 점',
-        content: {
-        type: 'text',
-          text: actions.wanted,
-          markdown: false,
-        },
-        accent: true,
-      },
-      {
-        type: 'description',
-        term: '시간',
-        content: {
-          type: 'text',
-          text: action_time,
-          markdown: false,
-        },
-        accent: true,
-      },
-    ],	
-  });
+  const {message, action_time, actions, value, react_user_id} = req.body;
+	
+	keyword_list = [] // 띄어쓰기 없는 채로 db에 넣기
+	if (actions.keyword != null) {
+		keyword_list = actions.keyword.replace(/\s/g,'').split(',');
+	}
+	
+	const User = require('../database/scheme/User').default;
+	await User.updateOne({worksID:String(react_user_id)},
+		{worksID: String(react_user_id), notiKeyword: keyword_list},
+		{upsert:true,setDefaultsOnInsert:true})
+
+	if (actions.keyword == null) {
+		await libKakaoWork.sendMessage({
+			conversationId: message.conversation_id,
+			text: '알림 서비스가 취소되었습니다!',
+			blocks: [
+				{
+					type: 'header',
+					text: '멘토링 키워드 알림 취소',
+					style: 'red'
+				},
+				{
+					type: 'text',
+					text: '알림 서비스가 취소되었습니다.\n이용해주셔서 감사합니다😊',
+					markdown: true,
+				},
+				{
+					type: 'button',
+					action_type: 'submit_action',
+					action_name: 'home',
+					value: 'home',
+					text: '멘토링 헬퍼 부르기',
+					style: 'default'
+				}
+			],
+		});
+	}
+	else {
+		await libKakaoWork.sendMessage({
+			conversationId: message.conversation_id,
+			text: '알림 신청이 완료되었습니다!',
+			blocks: [
+				{
+					type: 'header',
+					text: '멘토링 키워드 등록 완료',
+					style: 'blue'
+				},
+				{
+					type: 'text',
+					text: '등록된 키워드는 아래와 같습니다.\n게시글 업로드시 알려드리겠습니다😊',
+					markdown: true,
+				},
+				{
+					type: 'description',
+					term: '키워드',
+					content: {
+						type: 'text',
+						text: actions.keyword,
+						markdown: false,
+					},
+					accent: true,
+				},
+				{
+					type: 'button',
+					action_type: 'submit_action',
+					action_name: 'home',
+					value: 'home',
+					text: '멘토링 헬퍼 부르기',
+					style: 'default'
+				}
+			],
+		});
+	}
 }
 
 
@@ -178,7 +182,7 @@ async function handleSubmission(req) {
 // 모달은 request로 오는듯
 router.post('/request', async (req, res, next) => {
   const { message, value } = req.body;
-
+	
   switch (value) {
     case 'subscribe_btn':
       // 설문조사용 모달 전송
@@ -192,7 +196,7 @@ router.post('/request', async (req, res, next) => {
 					"blocks": [
 					{
 						"type": "label",
-						"text": "키워드를 입력해주세요\n",
+						"text": "알림 받으실 키워드를 입력해주세요\n작성하신 내용은 쉼표(,)를 바탕으로 구분되어 DB에 저장됩니다. 키워드에 공백은 구분하지 않습니다. \n추후 키워드가 제목 혹은 내용에 포함된 멘토링이 올라온다면, 멘토링 헬퍼가 알려드리겠습니다😊\n",
 						"markdown": true
 					},
 					{
@@ -203,7 +207,12 @@ router.post('/request', async (req, res, next) => {
 					},
 					{
 						"type": "label",
-						"text": "\n\n작성하신 내용은 쉼표(,)로 구분되어 DB에 저장됩니다. 해당 키워드가 포함된 게시글이 올라오면, 멘토링 헬퍼가 알려드리겠습니다.\n\n이미 키워드를 입력한 적이 있으시다면\n1. 새로 입력한 키워드로 덮어씌웁니다.\n2. 빈칸일 경우 알림 구독을 취소합니다.",
+						"text": "\n이미 키워드를 입력한 적이 있으시다면\n1. 새로 입력한 키워드로 덮어씌워지게 됩니다.\n2. 입력한 내용이 없다면 구독을 취소합니다.\n\n잦은 알림으로 인한 업무 방해를 방지하기 위해\n5분마다 새로운 게시글을 확인해서 알림을 드립니다\n", // 크롤러 주의사항
+						"markdown": true
+					},
+					{
+						"type": "label",
+						"text": "\n저희 서비스는 '관심분야'에 초점을 두어 제목/내용에 대한 키워드 알림만을 제공합니다. 만약 모든 알림이 필요하시면 0,시 등 보편적으로 글에 포함되는 문자를 추가해주세요.\n",
 						"markdown": true
 					}
 					]
@@ -225,10 +234,6 @@ router.post('/callback', async (req, res, next) => {
   const { message, type, actions, action_time, action_name, value } = req.body;
   console.log(req.body);
 	//subscriberManager.add(message.user_id, actions);
-	
-	// actions.keyword의 경우 modal 이외의 버튼을 눌렀을 때는 없는 값입니다! 예외처리 부탁드려요!
-	// console.log("user이름 : ", message.user_id);
-	// console.log("user설정 : ", actions.keyword);
 	
   const callbackHandler = {
 		'submission': handleSubmission,

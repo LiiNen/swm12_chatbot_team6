@@ -9,8 +9,9 @@ function dateFormatter(date) {
 }
 
 function textReduction(title) {
-	if (title.length > 75) {
-		title = title.substr(0, 73) + ' ...';
+	title = title.replace(/~/g, '〜');
+	if (title.length > 73) {
+		title = title.substr(0, 70) + ' ...';
 	}
 	return title;
 }
@@ -51,16 +52,16 @@ module.exports = function mentoringListView(conversationId) {
 		text: `[${textReduction(mentoring_object['title'])}](${mentoring_url}${String(mentoring_object['index'])})`,
 		markdown: true,
 	},
-	// {
-	// 	type: 'description',
-	// 	term: '멘토명',
-	// 	content: {
-	// 		type: 'text',
-	// 		text: mentoring_object['mentor'],
-	// 		markdown: false
-	// 	},
-	// 	accent: true
-	// },
+	{
+		type: 'description',
+		term: '멘토명',
+		content: {
+			type: 'text',
+			text: mentoring_object['mentor'],
+			markdown: false
+		},
+		accent: true
+	},
 	{
 		type: 'description',
 		term: '일자',

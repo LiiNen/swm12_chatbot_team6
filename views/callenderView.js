@@ -1,4 +1,14 @@
 // index title applyStartDate applyEndDate applyOpended eventStartTime mentor
+var fs= require('fs');
+
+
+function writeLog(log){
+	fs.readFile('./chanLog.txt','utf8',function(err,data){
+		var logdata = data;
+		logdata += log + '\n';
+		fs.writeFile('./chanLog.txt',logdata,'utf8',function(err,data){});
+	});
+}
 
 function dateFormatterForCalendar(input) {
 	var date = new Date(input);
@@ -9,11 +19,9 @@ function dateFormatterForCalendar(input) {
 	return `${date.getFullYear()}${date_month}${date_date}`;
 }
 
-
-
 function textReductionForCalendar(title) {
-	if (title.length > 50) {
-		title = title.substr(0, 50);
+	if (title.length > 400) {
+		title = title.substr(0, 400);
 	}
 	return title;
 }
@@ -36,24 +44,31 @@ function makeTime(obj){
 function makeUrl(obj){
 	var res = "https://calendar.google.com/calendar/render?";
 	res += "action=TEMPLATE";
-	res += "&text=" + encodeURI(obj.titlecal);
+	res += "&text=" + (obj.titlecal);
 	res += "&dates=" + makeTime(obj);
-	res += "&details=" + encodeURI(obj.contents);
+	res += "&details=" + (obj.contents);
 	if(obj.location == "")
 		res += "&location=" + "Korea";
 	else
 		res += "&location=" + obj.location;
 	
-	res = res.replace(/,/gi,"%20");
-	res = res.replace(/~/gi,"%20");
-	res = res.replace(/\(/gi,"%20");
-	res = res.replace(/\)/gi,"%20");
+	res = res.replace(/,/gi,"");
+	res = res.replace(/~/gi,"");
+	res = res.replace(/\(/gi,"<");
+	res = res.replace(/\)/gi,">");
+	res = res.replace(/\[/gi,"");
+	res = res.replace(/\]/gi,"");
+	res = res.replace(/\{/gi,"");
+	res = res.replace(/\}/gi,"");
+	res = res.replace(/\s/gi,"_");
+	//res = dateFormatterForCalendar(res);
 	return res;
 }
 
 
 module.exports = function callenderView(conversationId, responsebody) {
 	console.log('-----');
+	
 	response_json = JSON.parse(responsebody.value);
 	
 	var calendarObj = {titlecal : "",startDay: "", startTime: "",endDay: "",endTime: "",contents: "",location: ""}
@@ -66,6 +81,7 @@ module.exports = function callenderView(conversationId, responsebody) {
 	console.log(calendarObj);
 	var url = makeUrl(calendarObj);
 	console.log(url);
+	writeLog(url);
 	return {
 		conversationId,
 		text: '구글 캘린더 바로가기.',
@@ -77,12 +93,12 @@ module.exports = function callenderView(conversationId, responsebody) {
 			},
 			{
 				type: 'text',
-				text: ` 조회한 멘토링을 간편하게 구글 캘린더에 등록해보세요.\n`,
+				text: `멘토링을 신청하셨나요? 조회한 멘토링을 간편하게 구글 캘린더에 등록해보세요!\n제목, 날짜는 저희가 입력해드려요😆`,
 				markdown: true
 			},
 			{
 				type: 'text',
-				text: ` [지금 구글 캘린더에 추가하시겠어요?](${url})`,
+				text: `[지금 구글 캘린더에 추가하시겠어요?](${url})`,
 				markdown: true
 			},
 			{

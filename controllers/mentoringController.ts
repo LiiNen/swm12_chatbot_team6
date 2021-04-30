@@ -20,8 +20,9 @@ export class Controller {
       if(res==null){
         const doc = (new Mentoring(v));
         doc.save();
-				console.log("In Post ", doc.id);
-        keywordQueue.add(doc.id);
+		console.log("In Post ", doc.id);
+        const job = await keywordQueue.add({id:doc.id});
+	  // console.log("In Post ", job);
       }else{
         await Mentoring.updateOne({index: v.index}, v);
       }

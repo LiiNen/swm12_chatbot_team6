@@ -1,19 +1,36 @@
+function textReduction(title) {
+	title = title.replace(/~/g, '〜');
+	if (title.length > 73) {
+		title = title.substr(0, 70) + ' ...';
+	}
+	return title;
+}
+
+const mentoring_url = 'https://swmaestro.org/sw/mypage/mentoLec/view.do?menuNo=200046&qustnrSn='
 module.exports = function alamView(conversationId, mentoringInfo) {
-	console.log(conversationId);
-	console.log(mentoringInfo['title'])
   return {
     conversationId,
-		text: "Push alarm message",
+		text: "새로운 강의 알림",
 		blocks: [
 			{
 				type: "header",
-				text: "새 강의가 올라왔습니다.",
-				style: "red"
+				text: "등록한 키워드의 강의가 올라왔습니다!",
+				style: "blue"
 			},
 			{
 				type: 'text',
 				text: `[${textReduction(mentoringInfo['title'])}](${mentoring_url}${String(mentoringInfo['index'])})`,
 				markdown: true,
+			},
+			{
+				type: 'description',
+				term: '멘토명',
+				content: {
+					type: 'text',
+					text: mentoringInfo['mentor'],
+					markdown: false
+				},
+				accent: true
 			},
 			{
 				type: 'description',
@@ -51,11 +68,4 @@ function dateFormatter(date) {
 	date_date = date.getDate();
 	if (date_date < 10) date_date = '0' + date_date;
 	return `${date.getFullYear()}/${date_month}/${date_date}`;
-}
-
-function textReduction(title) {
-	if (title.length > 75) {
-		title = title.substr(0, 73) + ' ...';
-	}
-	return title;
 }
